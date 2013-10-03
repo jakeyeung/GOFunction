@@ -20,6 +20,10 @@ function(interestGenes, refGenes, organism = "org.Hs.eg.db", ontology = "BP", fd
       cat("Finding statistically significant terms...\n") 
       termInfo <- enrichmentFunction(annRef, annInterest,fdrmethod,fdrth)
       sigTerm <- termInfo$sigTerm
+	  if(nrow(sigTerm)==0){
+		  warning("There is no significant term! \n")
+		  return(NULL)
+	  }
       allTerm <- termInfo$allTerm
       
       ## Loading the GO structure data
@@ -60,7 +64,7 @@ function(interestGenes, refGenes, organism = "org.Hs.eg.db", ontology = "BP", fd
       
       ## Display the GO DAG plot for the significant terms
       
-      cat("Visulizing the GO DAG...\n")
+      cat("Visualizing the GO DAG...\n")
       require("graph") || stop("package graph is required")
       sigDAG <- createGODAG(as.character(sigTerm[,1]),ontology)
       allDAGTerm <- allTerm[allTerm[,1] %in% nodes(sigDAG),]

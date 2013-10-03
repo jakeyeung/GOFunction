@@ -33,6 +33,8 @@ function(sigTerm, generalAnn, sigTermRelation, annRef, annInterest, ppth, pcth)
               genes <- intersect(genes,annRef)
               sgenes <- intersect(genes,annInterest)
               childnode <- sigTermRelation[sigTermRelation[,1]==node,2]
+#cat("Panode:",node,"\n")
+#cat("Chnode:",childnode,"\n")
               if (length(childnode)==0) {
                   sigTerm[sigTerm[,1]==node,7] <- 1
               }
@@ -51,19 +53,29 @@ function(sigTerm, generalAnn, sigTermRelation, annRef, annInterest, ppth, pcth)
                       }
                       allcgenes <- intersect(allcgenes,annRef)
                       allcsiggenes <- intersect(allcgenes,annInterest)
-                      extragenes <- setdiff(genes,allcgenes)
-                      extrasiggenes <- intersect(extragenes,annInterest)
-                      if (length(extragenes)!=0) {
-                            fp <- length(extrasiggenes)/length(extragenes)
-                            fc <- length(allcsiggenes)/length(allcgenes)
-                            p <- 1-phyper(length(extrasiggenes)-1,allInterestnum,allRefnum-allInterestnum,length(extragenes),lower.tail = TRUE,log.p= FALSE)
-                            pc <- 1-phyper(length(allcsiggenes)-1,length(sgenes),length(genes)-length(sgenes),length(allcgenes),lower.tail = TRUE,log.p= FALSE)
-                            if (fp>=fc | p<=ppth) {
-                                 sigTerm[sigTerm[,1]==node,7] <- 1
-                                 if (pc>pcth)
-                                     sigTerm[sigTerm[,1] %in% activeChild,8] <- sigTerm[sigTerm[,1] %in% activeChild,8]+1
-                            }
-                        }
+					  
+					  if(length(setdiff(allcgenes,genes))>0){
+# cat("Parent Node:",node," annotated with ",length(genes)," genes while child Nodes:",as.character(activeChild), "annotated with ",length(allcgenes), " genes.\n")
+#cat("The number of different genes between parent node and child nodes is", length(setdiff(allcgenes,genes)),".\n")
+#cat("This may be the problem from annoation package GOFunction used!\n")
+					  }else{
+					  
+						  extragenes <- setdiff(genes,allcgenes)
+						  extrasiggenes <- intersect(extragenes,annInterest)
+						  if (length(extragenes)!=0) {
+							  fp <- length(extrasiggenes)/length(extragenes)
+							  fc <- length(allcsiggenes)/length(allcgenes)
+#cat("FP:",fp," FC:",fc," length(extrasiggenes):",length(extrasiggenes)," length(extragenes):",length(extragenes)," length(allcsiggenes):", length(allcsiggenes), " length(sgenes):", length(sgenes), " length(genes):",length(genes)," length(allcgenes):",length(allcgenes),"\n\n\n\n")
+						  
+							  p <- 1-phyper(length(extrasiggenes)-1,allInterestnum,allRefnum-allInterestnum,length(extragenes),lower.tail = TRUE,log.p= FALSE)
+							  pc <- 1-phyper(length(allcsiggenes)-1,length(sgenes),length(genes)-length(sgenes),length(allcgenes),lower.tail = TRUE,log.p= FALSE)
+							  if (fp>=fc | p<=ppth) {
+								  sigTerm[sigTerm[,1]==node,7] <- 1
+								  if (pc>pcth)
+										sigTerm[sigTerm[,1] %in% activeChild,8] <- sigTerm[sigTerm[,1] %in% activeChild,8]+1
+							  }
+						  }
+					  }
                   }
              }
          }

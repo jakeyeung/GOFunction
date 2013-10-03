@@ -24,11 +24,11 @@
 
 \author{
    Jing Wang
-   Maintainer: Zheng Guo <guoz@ems.hrbmu.edu.cn>
+   Maintainer: Jing Wang <jingwang.uestc@gmail.com>
 }
 
 \references{
-    Jing Wang et al. GO-function: deriving biologically relevant functions from statistically significant functions, Briefings in Bioinformatics, doi: 10.1093/bib/BBR041.
+    Jing Wang et al. GO-function: deriving biologically relevant functions from statistically significant functions, Brief Bioinform, 2012, 13(2): 216-227
 }
 
 \seealso{
