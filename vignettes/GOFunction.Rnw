@@ -1,0 +1,160 @@
+%\VignetteIndexEntry{GO-function}
+%\VignetteKeywords{GO-function, GO, redundancy treatment}
+%\VignettePackage{GOFunction}
+
+
+\documentclass[a4paper, oneside, 10pt]{article}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{calc}
+\usepackage{sectsty}
+\usepackage{caption}
+\renewcommand{\captionfont}{\it\sffamily}
+\renewcommand{\captionlabelfont}{\bf\sffamily}
+\allsectionsfont{\sffamily}
+
+% page style %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper, left=25mm, right=20mm, top=20mm, bottom=25mm, nohead]{geometry}
+\setlength{\parskip}{1.5ex}
+\setlength{\parindent}{0cm}
+\pagestyle{empty}
+
+
+\begin{document}
+
+\bibliographystyle{unsrt}
+
+\title{Manual of GO-function}
+\author{Jing Wang, Zheng Guo}
+
+\maketitle
+
+\section{Introduction}
+The GO-function package is an enrichment analysis tool for Gene Ontology (GO) ~\cite{Ashburner}. According to several 
+explicit rules, it is designed for treating the redundancy resulting from the GO structure
+or multiple annotation genes. Different from current redundancy treatment tools \cite{Alexa, Grossmann, Lu, Bauer} simply 
+based on some numerical considerations, GO-function can find terms which are both statistically interpretable and biologically meaningful.
+
+In this manual, we use one gene expression profile \cite{Sabates} for colorectal cancer to show the input and output of the GO-function package.
+The gene expression profile consists of 32 pairs of colorectal adenomas tissue and adjacent normal mucosa. The raw data were preprocessed using 
+Robust Multi-array Average (RMA) \cite{Irizarry}. The SOURCE database \cite{Diehn} (April, 2009) was used for the translation of ProbeIDs to GeneIDs. 
+9201 differentially expressed (DE) genes are selected using the Significance Analysis of Microarrays (SAM) method \cite{Tusher} with an FDR of 1\%. 
+These 9201 DE genes are analysed by GO-function as an example.
+
+\section{Environment and Input}
+\subsection{Environment}
+The R version is at least 2.11.1, which can be downloaded in our web. Before applying GO-function to analyse data, the users should install the following packages: 
+Biobase ($>$=2.8.0), graph ($>$=1.26.0), Rgraphviz ($>$=1.26.0), GO.db ($>$=2.4.1), AnnotationDbi ($>$=1.10.2), SparseM ($>$=0.85) and a gene annotation package for some organism (for example, "org.Hs.eg.db" ($>$=2.4.1) for human (See Input of the package for other organisms)). Before installing Rgraphviz package, the users should firstly install 
+graphviz tool which can be downloaded from the website http://www.graphviz.org/pub/graphviz/stable/. Note: the version of graphviz has to match the version used to build Rgraphviz. 
+Meanwhile, graphviz have to be on the path. We suggest using Rgraphviz 1.26.0 in R 2.11.1, which is corresponding to graphviz 2.20.3. We provide this graphviz version in our web. 
+The installation process of the above packages is as follows.
+
+$>$source("http://www.bioconductor.org/biocLite.R")
+
+$>$biocLite()
+
+$>$biocLite("graph")
+
+$>$biocLite("Rgraphviz")        \#before installing this package, the user has to install the graphviz
+
+$>$biocLite("SparseM")
+
+\subsection{Input}
+After building up the basic environment mentioned above, the users can install GO-function package and 
+run this package for the DE gene example.
+
+<<Example>>=
+library("GOFunction")
+data(exampledata)
+sigTerm <- GOFunction(interestGenes, refGenes, organism="org.Hs.eg.db", 
+            ontology="BP", fdrmethod="BY", fdrth=0.05, ppth=0.05, pcth=0.05, 
+            poth=0.05, peth=0.05, bmpSize=2000, filename="sigTerm")
+@
+
+
+Here is a description of all the arguments needed to get the enrichment results.
+
+      1. \emph{interestGenes} are the interesting genes and \emph{refGenes} are the reference 
+      genes for a dataset. For the gene expression data, the differentially expressed genes are 
+      the interesting genes and all scanned genes in the profile are the reference genes. 
+      \emph{interestGenes} and \emph{refGenes} should be denoted using the Entrez gene ID.
+
+      2. GO-function can be currently applied to analyse data for 18 organisms and the user should install 
+      the corresponding gene annotation package when analysing data for these organisms. 
+      The 18 organisms and the corresponding packages are as follows: Anopheles "org.Ag.eg.db", 
+      Bovine "org.Bt.eg.db", Canine "org.Cf.eg.db", Chicken "org.Gg.eg.db", Chimp "org.Pt.eg.db", 
+      E coli strain K12 "org.EcK12.eg.db", E coli strain Sakai "org.EcSakai.eg.db", Fly "org.Dm.eg.db", 
+      Human "org.Hs.eg.db", Mouse "org.Mm.eg.db", Pig "org.Ss.eg.db", Rat "org.Rn.eg.db", Rhesus "org.Mmu.eg.db", 
+      Streptomyces coelicolor "org.Sco.eg.db", Worm "org.Ce.eg.db", Xenopus "org.Xl.eg.db", Yeast "org.Sc.sgd.db", 
+      Zebrafish "org.Dr.eg.db". The default is "org.Hs.eg.db" for human.
+     
+      3. The default \emph{ontology} is "BP" (Biological Process). The "CC" (Cellular Component) and "MF" (Molecular Function) 
+      ontologies can also be used.
+     
+      4. GO-function provides three \emph{p} value correction methods: "bonferroni" \cite{Bland}, "BH" \cite{Benjamini1995} and "BY" \cite{Benjamini2001}. The default is "BY".
+
+      5. \emph{fdrth} is the fdr cutoff to identify statistically significant GO terms. The default is 0.05.
+     
+      6. \emph{ppth} is the significant level to test whether the remaining genes of the ancestor term are 
+      enriched with interesting genes after removing the genes in its significant offspring terms. The default is 0.05.
+     
+      7. \emph{pcth} is the significant level to test whether the frequency of interesting genes in the offspring terms 
+      are significantly different from that in the ancestor term. The default is 0.05.
+     
+      8. \emph{poth} is the significant level to test whether the overlapping genes of one term is significantly different from 
+      the non-overlapping genes of the term. The default is 0.05.
+     
+      9. \emph{peth} is the significant level to test whether the non-overlapping genes of one term is enriched with interesting genes.
+      The default is 0.05.
+     
+      10. \emph{bmpSize} is the width and height of the plot of GO DAG for all statistically significant terms. GO-function sets the default 
+      width and height of the plot as 2000 pixels in order to clearly show the GO DAG structure. If the GO DAG is very complexity, 
+      the user should increase \emph{bmpSize}. Note: If there is an error at the step of "bmp(filename, width = 2000,...)" when running 
+      GO-function, the user should decrease \emph{bmpSize}.
+      
+      11. \emph{filename} is the name of the files saving the table and the GO DAG of all statistically significant terms.
+
+
+
+\section{Output}
+There are two types of result output of GO-function. The first type is that GO-function saves a table to a CSV file (e.g. "sigTerm.csv") in the 
+current working folder. As exemplified in Table 1, the table contains seven columns: goid, name, refnum (the number of the reference genes in a GO term), 
+interestnum (the number of the interesting genes in a GO term), pvalue, adjustp (the corrected \emph{p} value by the fdr control) and FinalResults. 
+The "FinalResults" contains three types of terms: (1) "Local" represents terms removed after treating for local redundancy, (2) "Global" represents 
+terms removed after treating for global redundancy, and (3) "Final" represents the remained terms with evidence that their significance 
+should not be simply due to the overlapping genes. For the example of the gene expression profile, using GO-function, 108 GO terms are identified as 
+statistically significant terms with a 5\% FDR. After treating for local redundancy, 33 terms are remained. Finally, 25 terms are remained by GO-function 
+after global redundancy treatment. Table1 shows three terms for each of the three types of terms and all terms can be found in Figure 1. 
+
+\begin{table}[!ht]
+  \centering\resizebox{.9\linewidth}{!}{%
+    \begin{tabular}{lllccccc}
+      \hline
+      & goid & name  & refnum & interestnum & pvalue & adjustp & FinalResult \\
+      \hline
+      & GO:0000087 & M phase of mitotic cell cycle & 267 & 199 & 7.11E-15 & 3.15E-11 & Local \\
+      & GO:0000278 & mitotic cell cycle & 449 & 323 & <2.20E-16 & <2.20E-16 & Local\\
+      & GO:0000279 & M phase & 371 & 258 & 7.74E-13 & 2.16E-09 & Local\\
+      & GO:0000226 & microtubule cytoskeleton organization & 156 & 107 & 1.07E-05 & 8.89E-03 & Global\\
+      & GO:0007346 & regulation of mitotic cell cycle & 141 & 99 & 4.67E-06 & 4.24E-03 & Global\\
+      & GO:0032268 & regulation of cellular protein metabolic process & 471 & 292 & 2.29E-06 & 2.29E-03 & Global\\
+      & GO:0006260 & DNA replication & 222 & 166 & 7.72E-13 & 2.16E-09 & Final \\
+      & GO:0007059 & chromosome segregation & 85 & 65 & 1.96E-06 & 2.0E-03 & Final \\
+      & GO:0007067 & mitosis & 257 & 193 & 5.0E-15 & 2.51E-11 & Final \\
+      \hline
+    \end{tabular}}\caption{\small An example of the output table by GO-function.}
+  \label{tableGOF}
+\end{table}
+
+GO-function also saves the structure of GO DAG for all statistically significant terms into a plot (e.g. "sigTerm.bmp") in the current working folder. 
+As shown in Figure 1, "circle", "box" and "rectangle" represent the "Local", "Global" and "Final" terms in the table respectively. 
+The different color shades represent the adjusted p values of the terms.
+
+\begin{figure}[htp]
+\centering
+\includegraphics{sigTerm.jpg} 
+\caption{An example of the output plot by GO-function}\label{fig:sigTerm.jpg}
+\end{figure}
+
+\bibliography{GOFunction}
+\end{document}
