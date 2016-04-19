@@ -1,5 +1,7 @@
 import(methods,Biobase, AnnotationDbi)
 
+importMethodsFrom(DBI, dbGetQuery)
+
 importFrom(SparseM, t)
 
 

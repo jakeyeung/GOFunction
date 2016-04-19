@@ -1,7 +1,7 @@
 Package: GOFunction
 Type: Package
 Title: GO-function: deriving biologcially relevant functions from statistically significant functions
-Version: 1.19.0
+Version: 1.19.1
 Date: 2013-10-03
 Author: Jing Wang <jingwang.uestc@gmail.com>
 Maintainer: Jing Wang <jingwang.uestc@gmail.com>
@@ -15,7 +15,7 @@ Depends: R (>= 2.11.0), methods,
    Biobase (>= 2.8.0), graph (>= 1.26.0), 
    Rgraphviz (>= 1.26.0), GO.db (>= 2.4.1), 
    AnnotationDbi (>= 1.10.2), SparseM (>= 0.85)
-Imports: methods, Biobase, graph, Rgraphviz, GO.db, AnnotationDbi, SparseM
+Imports: methods, Biobase, graph, Rgraphviz, GO.db, AnnotationDbi, DBI, SparseM
 Collate: zzz.R 
    GOFunction.R
    enrichmentFunction.R
