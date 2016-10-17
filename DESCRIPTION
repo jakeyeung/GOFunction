@@ -1,7 +1,7 @@
 Package: GOFunction
 Type: Package
 Title: GO-function: deriving biologcially relevant functions from statistically significant functions
-Version: 1.21.0
+Version: 1.22.0
 Date: 2013-10-03
 Author: Jing Wang <jingwang.uestc@gmail.com>
 Maintainer: Jing Wang <jingwang.uestc@gmail.com>
