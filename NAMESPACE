@@ -6,3 +6,7 @@ importFrom(SparseM, t)
 
 
 export(GOFunction)
+export(createGODAG)
+export(enrichmentFunction)
+export(showSigNodes)
+
